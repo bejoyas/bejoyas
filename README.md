@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @bejoyas
-- 👀 I’m interested in CYBERSECURITY
+- 👀 I’m interested in cybersecurity
 
 
 <!---
