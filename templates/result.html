@@ -32,11 +32,33 @@
         <h2>{{ caption }}</h2>
         <p>{{ comment }}</p>
         <p>Share this image on your stories!</p>
-        <img src="/reports/{{ report }}" alt="Report">
+        <img src="/reports/{{ report }}" id="report-image" alt="Report">
         <div class="links">
             <a href="/reports/{{ report }}" download>Download Report</a> |
+            <a href="#" id="share-link">Share</a> |
             <a href="/">Rate another photo</a>
         </div>
+        <script>
+        document.getElementById('share-link').addEventListener('click', async function(ev) {
+            ev.preventDefault();
+            try {
+                const response = await fetch('/reports/{{ report }}');
+                const blob = await response.blob();
+                const file = new File([blob], '{{ report }}', { type: blob.type });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'My Hotness Score',
+                        text: 'Check out my hotness score!'
+                    });
+                } else {
+                    alert('Sharing not supported on this browser. Please download the image instead.');
+                }
+            } catch (e) {
+                alert('Unable to share image. Please download it instead.');
+            }
+        });
+        </script>
     </div>
 </body>
 </html>
