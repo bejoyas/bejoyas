@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+    <title>Your Hotness Score</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            color: #fff;
+        }
+        .content {
+            background: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            margin-top: 10px;
+        }
+        .links a {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Your Hotness Score: {{ score|round(1) }}/100</h1>
+        <h2>{{ caption }}</h2>
+        <p>{{ comment }}</p>
+        <p>Share this image on your stories!</p>
+        <img src="/reports/{{ report }}" alt="Report">
+        <div class="links">
+            <a href="/reports/{{ report }}" download>Download Report</a> |
+            <a href="/">Rate another photo</a>
+        </div>
+    </div>
+</body>
+</html>
