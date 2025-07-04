@@ -1,6 +1,6 @@
 # bejoyas
 
-This repository now contains a simple Flask web application that lets users upload a photo and receive a "hotness" score based on a heuristic using face landmarks. A report image with the score is generated so it can be shared on social media.
+
 
 ## Running Locally
 
