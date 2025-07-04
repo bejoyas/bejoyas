@@ -3,7 +3,9 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import mediapipe as mp
 import numpy as np
+
 import random
+
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -15,7 +17,12 @@ mp_face_mesh = mp.solutions.face_mesh
 
 
 def compute_beauty_score(landmarks):
+
     """Return a playful beauty score based on simple facial ratios."""
+
+    # Golden ratio based heuristic using selected landmark points
+    # Indices reference mediapipe face mesh landmarks
+
     key_points = {
         'left_eye_outer': 33,
         'right_eye_outer': 263,
@@ -27,7 +34,7 @@ def compute_beauty_score(landmarks):
     }
     pts = {name: np.array([landmarks[idx].x, landmarks[idx].y]) for name, idx in key_points.items()}
 
-    # basic ratios
+
     eye_distance = np.linalg.norm(pts['right_eye_outer'] - pts['left_eye_outer'])
     face_height = np.linalg.norm(pts['chin'] - pts['forehead'])
     ratio_eyes_face = eye_distance / face_height
@@ -46,8 +53,14 @@ def compute_beauty_score(landmarks):
     diff = abs(ratio_eyes_face - golden) + abs(ratio_mouth_nose - golden) + symmetry
     score = 100 - diff * 40
     score += random.uniform(-5, 5)  # add a touch of randomness for fun
+
+    # Compare ratios to golden ratio ~1.618
+    golden = 1.618
+    score = 100 - (abs(ratio_eyes_face - golden) + abs(ratio_mouth_nose - golden)) * 50
+
     score = max(0, min(100, score))
     return score
+
 
 
 def generate_caption(score: float) -> str:
@@ -87,6 +100,7 @@ def generate_comment(score: float) -> str:
         return "Stunning! Don't forget to share that confidence."
 
 
+
 def analyze_image(image_path):
     image = Image.open(image_path).convert('RGB')
     img_np = np.array(image)
@@ -111,6 +125,7 @@ def index():
         if score is None:
             os.remove(filename)
             return render_template('index.html', error='No face detected')
+
         caption = generate_caption(score)
         comment = generate_comment(score)
         report_path = os.path.join(REPORT_FOLDER, file.filename)
@@ -126,6 +141,15 @@ def index():
 
 
 def generate_report_image(img_path, score, caption, output_path):
+
+        report_path = os.path.join(REPORT_FOLDER, file.filename)
+        generate_report_image(filename, score, report_path)
+        return render_template('result.html', score=score, report=file.filename)
+    return render_template('index.html')
+
+
+def generate_report_image(img_path, score, output_path):
+
     image = Image.open(img_path).convert('RGB')
     draw = ImageDraw.Draw(image)
     try:
@@ -133,10 +157,15 @@ def generate_report_image(img_path, score, caption, output_path):
     except Exception:
         font = ImageFont.load_default()
     text = f"Hotness: {score:.1f}/100"
+
     caption_text = caption
     draw.rectangle([(0, 0), (image.width, 90)], fill=(0, 0, 0, 128))
     draw.text((10, 5), text, font=font, fill=(255, 255, 255))
     draw.text((10, 45), caption_text, font=font, fill=(255, 255, 255))
+
+    draw.rectangle([(0, 0), (image.width, 50)], fill=(0, 0, 0, 128))
+    draw.text((10, 5), text, font=font, fill=(255, 255, 255))
+
     image.save(output_path)
 
 
